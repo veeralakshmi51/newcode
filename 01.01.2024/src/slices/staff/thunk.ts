@@ -19,3 +19,19 @@ export const getAllStaff = async (dispatch: any) => {
       console.error(error);
     }
   };
+
+export const deleteStaffDetails=(username:string)=>async(dispatch:any)=>{
+  dispatch(isLoading());
+ try{
+  const response=await axios.delete(`${baseURL}/staff/delete/${username}`);
+  console.log('Deleted Staff Details:',response.data)
+  if(response.data.message.code===successCode){
+    getAllStaff(dispatch)
+  }else{
+    dispatch(setErrorMessage(response.data.message.description))
+  }
+ }catch(error){
+  dispatch(setIsLoadingFalse())
+  console.log('API Error:',error)
+}
+}

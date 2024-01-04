@@ -4,7 +4,6 @@ interface Organization {
   id: string;
   name: string;
   type: string;
-  // Add other properties as needed
 }
 
 interface OrganizationDetailsState {

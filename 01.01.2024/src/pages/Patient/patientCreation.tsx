@@ -377,7 +377,7 @@ const PatientCreation: React.FC = () => {
             faxed: ""
           }
         ],
-        deviceId: "",
+        deviceId: formValues.deviceId,
         devices: [
           {
             id: "",
