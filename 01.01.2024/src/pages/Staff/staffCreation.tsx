@@ -126,7 +126,8 @@ const Staff = () => {
         // if(response.data.)
       // const responseData = await response.json();
       console.log('Save response:', response);
-      if (response.data.message.code === 'MHC - 0200') navigate(-1)
+      if (response.data.message.code === 'MHC - 0200') navigate('/staff-table')
+      alert('New Staff Registered successfully')
       // Handle success or display error to the user
     } catch (error) {
       console.error('Error saving data:', error);

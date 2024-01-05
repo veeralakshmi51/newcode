@@ -42,13 +42,6 @@ const PatientCreationSlice = createSlice({
       state.loading = false;
       state.patientData = action.payload;
     },
-    updatePatientSuccess(state, action: PayloadAction<Patient>) {
-      state.loading = false;
-
-      state.patientData = state.patientData.map(patient =>
-        patient.id === action.payload.id ? action.payload : patient
-      );
-    },
     
   },
 });
@@ -59,7 +52,7 @@ export const {
   setErrorMessage,
   closeErrorPopup,
   getPatientSuccess,
-  updatePatientSuccess,
+  
 
 } = PatientCreationSlice.actions;
 

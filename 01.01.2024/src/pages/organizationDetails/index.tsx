@@ -23,7 +23,6 @@ const Organization: React.FC = () => {
 
   const dispatch = useDispatch<any>();
   const { organizationDetails } = useSelector((state: any) => state.Organization);
-
   const itemsPerPage = 6;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(organizationDetails.length / itemsPerPage);

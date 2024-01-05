@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAllPatient, updatePatientDetails,deletePatientDetails } from "../../slices/patient/thunk";
+import { getAllPatient, updatePatientDetails,deletePatientDetails } from "../../slices/thunk";
 import { FaPlus } from "react-icons/fa";
 import { Pagination } from "react-bootstrap";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
@@ -24,7 +24,7 @@ interface FormData {
   postalCode: string;
   mrNumber: string;
   email: string;
-  deviceId: string;
+  beaconDevice: string;
   gender: string;
   country: string;
 }
@@ -51,7 +51,7 @@ const Patient: React.FC = () => {
     postalCode: "",
     mrNumber: "",
     email: "",
-    deviceId: "",
+    beaconDevice: "",
     gender: "",
     country: "",
   });
@@ -127,6 +127,7 @@ useEffect(() => {
         },
       ],
       email: formData.email,
+      organization,
       contact: [
         {
           address: [
@@ -142,10 +143,10 @@ useEffect(() => {
           
         },
       ],
-      deviceId:formData.deviceId,
+      beaconDevice:formData.beaconDevice,
     }
     console.log('Before Update:',patientData)
-    updatePatientDetails(selectPatientId, updatedPatientFields, setEditModal, organization)(dispatch);
+    dispatch(updatePatientDetails(selectPatientId, updatedPatientFields, setEditModal, organization));
     
     console.log('After Update:',updatedPatientFields)
     setEditModal(false);
@@ -184,7 +185,7 @@ useEffect(() => {
         postalCode: address?.postalCode || '',
         mrNumber: basicDetails.mrNumber || '',
         email: selectedPatient.email || '',
-        deviceId: selectedPatient.beaconDevice || '', 
+        beaconDevice: selectedPatient.beaconDevice || '', 
         gender: basicDetails.gender || '',
         country: address?.country || '',
       });
@@ -329,7 +330,7 @@ if(confirmDelete){
                   onChange={handleChange}
                 />
                 <label
-                  htmlFor="SSN"
+                  htmlFor="ssn"
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
                 >
@@ -373,7 +374,8 @@ if(confirmDelete){
                   placeholder="Enter Gender"
                   value={formData.gender}
                   onChange={handleChange}
-                /><label
+                />
+                <label
                 htmlFor="birthDate"
                 className="floating-label"
                 style={{ fontWeight: "bold" }}
@@ -489,10 +491,10 @@ if(confirmDelete){
                 </label>
                 <input
                   type="text"
-                  id="deviceId"
-                  name="deviceId"
+                  id="beaconDevice"
+                  name="beaconDevice"
                   placeholder="Enter Device ID"
-                  value={formData.deviceId}
+                  value={formData.beaconDevice}
                   onChange={handleChange}
                 />
               </div>

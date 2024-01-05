@@ -3,46 +3,69 @@ import { FaPlus } from "react-icons/fa";
 import { Pagination } from "react-bootstrap";
 import "./staff.css";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllStaff, deleteStaffDetails } from "../../slices/thunk";
+import { getAllStaff, deleteStaffDetails,updateStaffDetails} from "../../slices/thunk";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-
-// interface FormData {
-//   firstName: string;
-//   middleName: string ;
-//   lastName:  string;
-//   birthofBirth: string;
-//   ssn: string;
-//   npi:string;
-//   addressLine1: string;
-//   addressLine2: string;
-//   city: string;
-//   state: string;
-//   postalCode: string;
-//   mrNumber: string;
-//   email: string;
-//   deviceId: string;
-//   gender: string;
-//   country: string;
-//   role:string;
-//   speciality:string;
-//   startDate:string;
-// }
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { Modal, ModalFooter, ModalHeader, ModalBody, Button } from "reactstrap";
+import Loader from "../../components/loader/Loader";
+interface FormData {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  dateofBirth: string;
+  ssn: string;
+  npi: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  phoneNumber: string;
+  email: string;
+  gender: string;
+  country: string;
+  role: string;
+  speciality: string;
+  startDate: string;
+}
 
 const Staff: React.FC = () => {
-  //const [selectsStaffId,setSelectStaffId]=useState<string|null>(null)
+  const [selectStaffId, setSelectStaffId] = useState<string | null>(null);
   const dispatch = useDispatch<any>();
-  const { staffData } = useSelector((state: any) => state.Staff);
+  const { staffData, loading } = useSelector((state: any) => state.Staff);
+  const { organization } = useSelector((state: any) => state.Login);
+  const [editModal, setEditModal] = useState(false);
   const navigate = useNavigate();
   const itemsPerPage = 8;
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [formData, setFormData] = useState<FormData>({
+    firstName: " ",
+    middleName: " ",
+    lastName: " ",
+    dateofBirth: " ",
+    ssn: " ",
+    npi: " ",
+    addressLine1: " ",
+    addressLine2: " ",
+    city: " ",
+    state: " ",
+    postalCode: " ",
+    phoneNumber: " ",
+    email: " ",
+    gender: " ",
+    country: " ",
+    role: " ",
+    speciality: " ",
+    startDate: " ",
+  });
+
   useEffect(() => {
-    getAllStaff(dispatch);
-  }, [dispatch]);
+    getAllStaff(dispatch,organization);
+  }, [dispatch, organization]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -91,15 +114,104 @@ const Staff: React.FC = () => {
     const confirmDelete = window.confirm("Are You Sure Do You Want To Delete?");
     if (confirmDelete) {
       try {
-        await dispatch(deleteStaffDetails(username));
+        await dispatch(deleteStaffDetails(username,organization));
         toast.success("Staff Details deleted successfully");
       } catch (error) {
         toast.error("Failed to delete organization");
       }
     }
   };
+
+  const handleSaveChanges = () => {
+    console.log("Form Data:", formData);
+    if (!selectStaffId) {
+      console.log("Selected staff ID is not found");
+      return;
+    }
+
+    const updatedStaffFields = {
+      id: selectStaffId,
+      name: [
+        {
+          use: formData.middleName,
+          given: formData.firstName,
+          family: formData.lastName,
+        },
+      ],
+      gender: formData.gender,
+      email: formData.email,
+      role: formData.role,
+      organization,
+      startDate: formData.startDate,
+      speciality: [formData.speciality],
+      dateofBirth: formData.dateofBirth,
+      ssn: formData.ssn,
+      npi: formData.npi,
+      contact: [
+        {
+          address: [
+            {
+              addressLine1: formData.addressLine1,
+              addressLine2: formData.addressLine2,
+              city: formData.city,
+              state: formData.state,
+              country: formData.country,
+              zip: formData.postalCode,
+            },
+          ],
+        },
+      ],
+    };
+    console.log("Before Update:",staffData)
+    updateStaffDetails(selectStaffId,updatedStaffFields,setEditModal,organization);
+
+    console.log('After Update:',updatedStaffFields);
+    setEditModal(false);
+  };
+
+  const handleClick = (selectStaff: any) => {
+    console.log("Clicked Staff Details:", selectStaff);
+    if (selectStaff) {
+      const staffId = selectStaff.id || "";
+      setSelectStaffId(staffId);
+      console.log("Staff ID:", staffId);
+      setFormData({
+        firstName: selectStaff.name[0]?.given || "",
+        middleName: selectStaff.name[0]?.use || "",
+        lastName: selectStaff.name[0]?.family || "",
+        dateofBirth: selectStaff.dateofBirth || "",
+        ssn: selectStaff.ssn || "",
+        npi: selectStaff.npi || "",
+        addressLine1: selectStaff.contact[0]?.address[0]?.addressLine1 || "",
+        addressLine2: selectStaff.contact[0]?.address[0]?.addressLine2 || "",
+        city: selectStaff.contact[0]?.address[0]?.city || "",
+        state: selectStaff.contact[0]?.address[0]?.state || "",
+        postalCode: selectStaff.contact[0]?.address[0]?.zip || "",
+        phoneNumber: selectStaff.contact[0]?.phoneNumber || "",
+        email: selectStaff.email || "",
+        gender: selectStaff.gender || "",
+        country: selectStaff.contact[0]?.address[0]?.country || "",
+        role: selectStaff.role || "",
+        speciality: selectStaff.speciality[0] || "",
+        startDate: selectStaff.startDate || "",
+      });
+      setEditModal(true)
+    }
+    else {
+      console.error('Invalid staff data:', selectStaff);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
   return (
     <div className="main">
+      { loading && <Loader /> }
       <div className="table-container">
         <div className="heading1">
           <h4>All Staff List</h4>
@@ -114,23 +226,25 @@ const Staff: React.FC = () => {
         <table className="table table-bordered">
           <thead>
             <tr>
-              {/* <th scope="col">Staff ID</th> */}
               <th scope="col">Staff Name</th>
+              <th scope="col">Staff ID</th>
               <th scope="col">Date of Birth</th>
               <th scope="col">SSN</th>
               <th scope="col">Job Title</th>
               <th scope="col">Role</th>
               <th scope="col">Action</th>
-              {/* <th scope="col">Start Date</th> */}
             </tr>
           </thead>
           <tbody>
             {currentStaffData.map((staff: any) => (
               <tr key={staff.id}>
-                {/* <td>{staff.id}</td> */}
-                <td>
+                <td
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleClick(staff)}
+                >
                   {staff.name[0].given} {staff.name[0].family}
                 </td>
+                <td>{staff.id}</td>
                 <td>{staff.dateofBirth}</td>
                 <td>{staff.ssn}</td>
                 <td>{staff.userType}</td>
@@ -148,6 +262,298 @@ const Staff: React.FC = () => {
             ))}
           </tbody>
         </table>
+        <Modal isOpen={editModal} toggle={() => setEditModal(false)} centered>
+          <ModalHeader toggle={() => setEditModal(false)}>
+            <h3>Staff Details</h3>
+          </ModalHeader>
+          <ModalBody>
+            <div>
+              <div className="form-control">
+                <label
+                  htmlFor="firstName"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  FirstName
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  placeholder="Enter First Name"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="middleName"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Middle Name
+                </label>
+                <input
+                  type="text"
+                  id="middleName"
+                  name="middleName"
+                  placeholder="Enter Middle Name"
+                  value={formData.middleName}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="lastName"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  placeholder="Enter Last Name"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="email"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Email
+                </label>
+                <input
+                  type="text"
+                  id="email"
+                  name="email"
+                  placeholder="Enter Email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="ssn"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  SSN
+                </label>
+                <input
+                  type="text"
+                  id="ssn"
+                  name="ssn"
+                  placeholder="Enter SSN"
+                  value={formData.ssn}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="npi"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  NPI#
+                </label>
+                <input
+                  type="text"
+                  id="npi"
+                  name="npi"
+                  placeholder="Enter NPI"
+                  value={formData.npi}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="phoneNumber"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  PhoneNumber
+                </label>
+                <input
+                  type="text"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  placeholder="Enter PhoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                />
+
+                <label
+                  htmlFor="gender"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Gender
+                </label>
+                <input
+                  type="text"
+                  id="gender"
+                  name="gender"
+                  placeholder="Enter Gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="dateofBirth"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Date Of Birth
+                </label>
+                <input
+                  type="text"
+                  id="dateofBirth"
+                  name="dateofBirth"
+                  placeholder="Enter BirthDate"
+                  value={formData.dateofBirth}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="startDate"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Start Date
+                </label>
+                <input
+                  type="text"
+                  id="startDate"
+                  name="startDate"
+                  placeholder="Enter Start Date"
+                  value={formData.startDate}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="addressLine1"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  AddressLine 1
+                </label>
+                <input
+                  type="text"
+                  id="addressLine1"
+                  name="addressLine1"
+                  placeholder="Enter Address"
+                  value={formData.addressLine1}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="addressLine2"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  AddressLine 2
+                </label>
+                <input
+                  type="text"
+                  id="addressLine2"
+                  name="addressLine2"
+                  placeholder="Enter Address"
+                  value={formData.addressLine2}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="city"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  City
+                </label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  placeholder="Enter City"
+                  value={formData.city}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="state"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  State/Provide
+                </label>
+                <input
+                  type="text"
+                  id="state"
+                  name="state"
+                  placeholder="Enter State"
+                  value={formData.state}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="postalCode"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Zip/Postal Code
+                </label>
+                <input
+                  type="text"
+                  id="postalCode"
+                  name="postalCode"
+                  placeholder="Enter ZipCode"
+                  value={formData.postalCode}
+                  onChange={handleChange}
+                />
+
+                <label
+                  htmlFor="country"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Country
+                </label>
+                <input
+                  type="text"
+                  id="country"
+                  name="country"
+                  placeholder="Enter Country"
+                  value={formData.country}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="role"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Role
+                </label>
+                <input
+                  type="text"
+                  id="role"
+                  name="role"
+                  placeholder="Enter Role"
+                  value={formData.role}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="speciality"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Speciality
+                </label>
+                <input
+                  type="text"
+                  id="speciality"
+                  name="speciality"
+                  placeholder="Enter Speciality"
+                  value={formData.speciality}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button color="info" onClick={handleSaveChanges}>
+              Save Changes
+            </Button>{" "}
+            <Button color="danger" onClick={() => setEditModal(false)}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Modal>
         <Pagination>
           <Pagination.Prev
             onClick={() => setCurrentPage(currentPage - 1)}
