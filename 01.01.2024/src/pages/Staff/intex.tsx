@@ -9,7 +9,31 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+
+// interface FormData {
+//   firstName: string;
+//   middleName: string ;
+//   lastName:  string;
+//   birthofBirth: string;
+//   ssn: string;
+//   npi:string;
+//   addressLine1: string;
+//   addressLine2: string;
+//   city: string;
+//   state: string;
+//   postalCode: string;
+//   mrNumber: string;
+//   email: string;
+//   deviceId: string;
+//   gender: string;
+//   country: string;
+//   role:string;
+//   speciality:string;
+//   startDate:string;
+// }
+
 const Staff: React.FC = () => {
+  //const [selectsStaffId,setSelectStaffId]=useState<string|null>(null)
   const dispatch = useDispatch<any>();
   const { staffData } = useSelector((state: any) => state.Staff);
   const navigate = useNavigate();

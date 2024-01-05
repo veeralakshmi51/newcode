@@ -31,7 +31,7 @@ interface FormData {
 
 const Patient: React.FC = () => {
   const dispatch = useDispatch<any>();
-  const [selectPatientId,setSelectPatientId]=useState< |null>(null);
+  const [selectPatientId,setSelectPatientId]=useState<string|null>(null);
   const [editModal, setEditModal] = useState(false);
   const { patientData, loading } = useSelector((state: any) => state.Patient);
   const { organization } = useSelector((state: any) => state.Login);
@@ -55,9 +55,10 @@ const Patient: React.FC = () => {
     gender: "",
     country: "",
   });
-  useEffect(() => {
-    getAllPatient(dispatch,organization);
-  }, [dispatch]);
+ 
+useEffect(() => {
+  getAllPatient(dispatch, organization);
+}, [dispatch, organization]);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentPatientData = patientData && patientData?.slice(
@@ -71,8 +72,8 @@ const Patient: React.FC = () => {
 
     const pageNumbersToShow = Math.min(5, totalPages);
 
-    let startPage: any;
-    let endPage: any;
+    let startPage: number;
+    let endPage: number;
 
     if (totalPages <= pageNumbersToShow) {
       startPage = 1;
@@ -144,7 +145,7 @@ const Patient: React.FC = () => {
       deviceId:formData.deviceId,
     }
     console.log('Before Update:',patientData)
-    dispatch(updatePatientDetails(selectPatientId,updatedPatientFields, setEditModal))
+    updatePatientDetails(selectPatientId, updatedPatientFields, setEditModal, organization)(dispatch);
     
     console.log('After Update:',updatedPatientFields)
     setEditModal(false);
@@ -197,7 +198,7 @@ const handleDelete=async(username:string)=>{
 const confirmDelete=window.confirm("Are You Sure Do You Want To Delete?");
 if(confirmDelete){
   try{
-    await dispatch(deletePatientDetails(username));
+    await dispatch(deletePatientDetails(username,organization));
     toast.success('Patient Details Deleted Successfully');
   }catch{
     toast.error('Failed to Delete Patient Details');
@@ -357,11 +358,7 @@ if(confirmDelete){
                   value={formData.mrNumber}
                   onChange={handleChange}
                 />
-                <label
-                  htmlFor="addressLine1"
-                  className="floating-label"
-                  style={{ fontWeight: "bold" }}
-                >
+                
                   <label
                   htmlFor="gender"
                   className="floating-label"
@@ -391,6 +388,11 @@ if(confirmDelete){
                 value={formData.birthDate}
                 onChange={handleChange}
               />
+              <label
+                  htmlFor="addressLine1"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
                   AddressLine 1
                 </label>
                 <input

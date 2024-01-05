@@ -1,64 +1,15 @@
-// import { createSlice,PayloadAction } from "@reduxjs/toolkit";
+import { createSlice,PayloadAction } from "@reduxjs/toolkit";
 
-// interface Patient{
-//   id:string;
-// }
-// interface PatientDetailsState{
-//   loading: boolean,
-//   patientData: Patient[],
-//   isOpen: boolean,
-//   errorMsg: string,
-// }
-//  const initialState :PatientDetailsState={
-//   loading: false,
-//   patientData: [],
-//   isOpen: false,
-//   errorMsg: "",
-// };
-
-// const PatientCreationSlice = createSlice({
-//   name: "patientData",
-//   initialState,
-//   reducers: {
-//     isLoading(state) {
-//       state.loading = true;
-//     },
-
-//     setIsLoadingFalse(state) {
-//       state.loading = false;
-//     },
-//     setErrorMessage(state, action:PayloadAction<string>) {
-//       state.loading = false;
-//       state.isOpen = true;
-//       state.errorMsg = action.payload;
-//     },
-
-//     closeErrorPopup(state) {
-//       state.isOpen = false;
-//       state.errorMsg = "";
-//     },
-
-//     getPatientSuccess(state, action:PayloadAction<Patient[]>) {
-//       state.loading = false;
-//       state.patientData = action.payload;
-//     }
-    
-//   },
-// });
-
-// export const {
-//   isLoading,
-//   setIsLoadingFalse,
-//   setErrorMessage,
-//   closeErrorPopup,
-//   getPatientSuccess,
-
-// } = PatientCreationSlice.actions;
-
-// export default PatientCreationSlice.reducer;
-import { createSlice } from "@reduxjs/toolkit";
-
-export const initialState = {
+interface Patient{
+  id:string;
+}
+interface PatientDetailsState{
+  loading: boolean,
+  patientData: Patient[],
+  isOpen: boolean,
+  errorMsg: string,
+}
+ const initialState :PatientDetailsState={
   loading: false,
   patientData: [],
   isOpen: false,
@@ -76,7 +27,7 @@ const PatientCreationSlice = createSlice({
     setIsLoadingFalse(state) {
       state.loading = false;
     },
-    setErrorMessage(state, action) {
+    setErrorMessage(state, action:PayloadAction<string>) {
       state.loading = false;
       state.isOpen = true;
       state.errorMsg = action.payload;
@@ -87,10 +38,18 @@ const PatientCreationSlice = createSlice({
       state.errorMsg = "";
     },
 
-    getPatientSuccess(state, action) {
+    getPatientSuccess(state, action:PayloadAction<Patient[]>) {
       state.loading = false;
       state.patientData = action.payload;
     },
+    updatePatientSuccess(state, action: PayloadAction<Patient>) {
+      state.loading = false;
+
+      state.patientData = state.patientData.map(patient =>
+        patient.id === action.payload.id ? action.payload : patient
+      );
+    },
+    
   },
 });
 
@@ -100,6 +59,8 @@ export const {
   setErrorMessage,
   closeErrorPopup,
   getPatientSuccess,
+  updatePatientSuccess,
+
 } = PatientCreationSlice.actions;
 
 export default PatientCreationSlice.reducer;
