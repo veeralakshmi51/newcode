@@ -5,7 +5,7 @@ import "./staff.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllStaff, deleteStaffDetails,updateStaffDetails} from "../../slices/thunk";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -22,14 +22,15 @@ interface FormData {
   addressLine2: string;
   city: string;
   state: string;
-  postalCode: string;
-  phoneNumber: string;
+  zip: string;
+  mobilePhone: string;
   email: string;
   gender: string;
   country: string;
   role: string;
   speciality: string;
   startDate: string;
+  active:string;
 }
 
 const Staff: React.FC = () => {
@@ -53,14 +54,15 @@ const Staff: React.FC = () => {
     addressLine2: " ",
     city: " ",
     state: " ",
-    postalCode: " ",
-    phoneNumber: " ",
+    zip: " ",
+    mobilePhone: " ",
     email: " ",
     gender: " ",
     country: " ",
     role: " ",
     speciality: " ",
     startDate: " ",
+    active:" ",
   });
 
   useEffect(() => {
@@ -69,7 +71,7 @@ const Staff: React.FC = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentStaffData = staffData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentStaffData = staffData && staffData?.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   const renderPageNumbers = () => {
@@ -156,15 +158,16 @@ const Staff: React.FC = () => {
               city: formData.city,
               state: formData.state,
               country: formData.country,
-              zip: formData.postalCode,
+              zip: formData.zip,
             },
           ],
+          mobilePhone:formData.mobilePhone,
         },
       ],
+      active:formData.active,
     };
     console.log("Before Update:",staffData)
-    updateStaffDetails(selectStaffId,updatedStaffFields,setEditModal,organization);
-
+    dispatch(updateStaffDetails(selectStaffId, updatedStaffFields, setEditModal, organization));
     console.log('After Update:',updatedStaffFields);
     setEditModal(false);
   };
@@ -186,14 +189,15 @@ const Staff: React.FC = () => {
         addressLine2: selectStaff.contact[0]?.address[0]?.addressLine2 || "",
         city: selectStaff.contact[0]?.address[0]?.city || "",
         state: selectStaff.contact[0]?.address[0]?.state || "",
-        postalCode: selectStaff.contact[0]?.address[0]?.zip || "",
-        phoneNumber: selectStaff.contact[0]?.phoneNumber || "",
+        zip: selectStaff.contact[0]?.address[0]?.zip || "",
+        mobilePhone: selectStaff.contact[0]?.mobilePhone || "",
         email: selectStaff.email || "",
         gender: selectStaff.gender || "",
         country: selectStaff.contact[0]?.address[0]?.country || "",
         role: selectStaff.role || "",
         speciality: selectStaff.speciality[0] || "",
         startDate: selectStaff.startDate || "",
+        active:selectStaff.active || " ",
       });
       setEditModal(true)
     }
@@ -212,6 +216,7 @@ const Staff: React.FC = () => {
   return (
     <div className="main">
       { loading && <Loader /> }
+      <ToastContainer/>
       <div className="table-container">
         <div className="heading1">
           <h4>All Staff List</h4>
@@ -371,7 +376,7 @@ const Staff: React.FC = () => {
                   id="phoneNumber"
                   name="phoneNumber"
                   placeholder="Enter PhoneNumber"
-                  value={formData.phoneNumber}
+                  value={formData.mobilePhone}
                   onChange={handleChange}
                 />
 
@@ -492,7 +497,7 @@ const Staff: React.FC = () => {
                   id="postalCode"
                   name="postalCode"
                   placeholder="Enter ZipCode"
-                  value={formData.postalCode}
+                  value={formData.zip}
                   onChange={handleChange}
                 />
 

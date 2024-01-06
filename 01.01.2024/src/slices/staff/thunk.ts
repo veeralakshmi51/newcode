@@ -8,7 +8,7 @@ export const getAllStaff = async (dispatch: any,organization:string) => {
     dispatch(isLoading());
     try {
       const response = await axios.get(`${baseURL}/staff/get/ActiveStaff/${organization}`);
-  
+      console.log('API response',response.data)
       if (response.data.message.code === successCode) {
         dispatch(getStaffSuccess(response.data.data));
       } else {
@@ -16,7 +16,7 @@ export const getAllStaff = async (dispatch: any,organization:string) => {
       }
     } catch (error) {
       dispatch(setIsLoadingFalse());
-      console.error(error);
+      console.error('API error:',error);
     }
   };
 
@@ -47,7 +47,7 @@ export const updateStaffDetails = (id: string, data: any, setEditModal: (b: bool
     const response = await axios.put(`${baseURL}/staff/update/${id}`, data);
 
     console.log('Update API Response:', data);
-
+    
     if (response.data.message.code === successCode) {
       dispatch(setIsLoadingFalse());
       setEditModal(false);
