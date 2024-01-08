@@ -9,6 +9,7 @@ import rootReducer from './slices';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import 'react-tabs/style/react-tabs.css'
+import './style.css'
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

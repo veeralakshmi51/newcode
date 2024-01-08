@@ -1,20 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAllPatient, updatePatientDetails,deletePatientDetails } from "../../slices/thunk";
+import {
+  getAllPatient,
+  updatePatientDetails,
+  deletePatientDetails,
+} from "../../slices/thunk";
 import { FaPlus } from "react-icons/fa";
 import { Pagination } from "react-bootstrap";
-import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Table,
+} from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../../components/loader/Loader";
 import { toast } from "react-toastify";
-
+import "./patient.css";
 interface FormData {
   firstName: string;
-  middleName: string ;
-  lastName:  string;
+  middleName: string;
+  lastName: string;
   birthDate: string;
   ssn: string;
   addressLine1: string;
@@ -31,7 +42,7 @@ interface FormData {
 
 const Patient: React.FC = () => {
   const dispatch = useDispatch<any>();
-  const [selectPatientId,setSelectPatientId]=useState<string|null>(null);
+  const [selectPatientId, setSelectPatientId] = useState<string | null>(null);
   const [editModal, setEditModal] = useState(false);
   const { patientData, loading } = useSelector((state: any) => state.Patient);
   const { organization } = useSelector((state: any) => state.Login);
@@ -55,16 +66,14 @@ const Patient: React.FC = () => {
     gender: "",
     country: "",
   });
- 
-useEffect(() => {
-  getAllPatient(dispatch, organization);
-}, [dispatch, organization]);
+
+  useEffect(() => {
+    getAllPatient(dispatch, organization);
+  }, [dispatch, organization]);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPatientData = patientData && patientData?.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentPatientData =
+    patientData && patientData?.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   const renderPageNumbers = () => {
@@ -104,13 +113,13 @@ useEffect(() => {
     ));
   };
   const handleSaveChanges = () => {
-   console.log("Form Data:",formData);
-   if(!selectPatientId){
-    console.error("Selected Patient ID is not found");
-    return;
-   }
-   const updatedPatientFields={
-    id:selectPatientId,
+    console.log("Form Data:", formData);
+    if (!selectPatientId) {
+      console.error("Selected Patient ID is not found");
+      return;
+    }
+    const updatedPatientFields = {
+      id: selectPatientId,
       basicDetails: [
         {
           name: [
@@ -140,19 +149,23 @@ useEffect(() => {
               country: formData.country,
             },
           ],
-          
         },
       ],
-      beaconDevice:formData.beaconDevice,
-    }
-    console.log('Before Update:',patientData)
-    dispatch(updatePatientDetails(selectPatientId, updatedPatientFields, setEditModal, organization));
-    
-    console.log('After Update:',updatedPatientFields)
-    setEditModal(false);
-}
-  
+      beaconDevice: formData.beaconDevice,
+    };
+    console.log("Before Update:", patientData);
+    dispatch(
+      updatePatientDetails(
+        selectPatientId,
+        updatedPatientFields,
+        setEditModal,
+        organization
+      )
+    );
 
+    console.log("After Update:", updatedPatientFields);
+    setEditModal(false);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -161,59 +174,60 @@ useEffect(() => {
       [name]: value,
     }));
   };
-  
+
   const handleClick = (selectedPatient: any) => {
-    console.log('Clicked patient Details:', selectedPatient);
-  
+    console.log("Clicked patient Details:", selectedPatient);
+
     if (selectedPatient) {
-      const patientId = selectedPatient.id || '';
+      const patientId = selectedPatient.id || "";
       setSelectPatientId(patientId);
-      console.log('Patiend ID:',patientId)
+      console.log("Patiend ID:", patientId);
       const basicDetails = selectedPatient.basicDetails[0];
       const address = selectedPatient.contact[0]?.address[0];
-  
+
       setFormData({
-        firstName: basicDetails.name[0]?.given || '',
-        middleName: basicDetails.name[0]?.use || '', 
-        lastName: basicDetails.name[0]?.family || '',
-        birthDate: basicDetails.birthDate || '',
-        ssn: basicDetails.ssn || '',
-        addressLine1: address?.addressLine1 || '',
-        addressLine2: address?.addressLine2 || '',
-        city: address?.city || '',
-        state: address?.state || '',
-        postalCode: address?.postalCode || '',
-        mrNumber: basicDetails.mrNumber || '',
-        email: selectedPatient.email || '',
-        beaconDevice: selectedPatient.beaconDevice || '', 
-        gender: basicDetails.gender || '',
-        country: address?.country || '',
+        firstName: basicDetails.name[0]?.given || "",
+        middleName: basicDetails.name[0]?.use || "",
+        lastName: basicDetails.name[0]?.family || "",
+        birthDate: basicDetails.birthDate || "",
+        ssn: basicDetails.ssn || "",
+        addressLine1: address?.addressLine1 || "",
+        addressLine2: address?.addressLine2 || "",
+        city: address?.city || "",
+        state: address?.state || "",
+        postalCode: address?.postalCode || "",
+        mrNumber: basicDetails.mrNumber || "",
+        email: selectedPatient.email || "",
+        beaconDevice: selectedPatient.beaconDevice || "",
+        gender: basicDetails.gender || "",
+        country: address?.country || "",
       });
-  
+
       setEditModal(true);
     } else {
-      console.error('Invalid patient data:', selectedPatient);
+      console.error("Invalid patient data:", selectedPatient);
     }
   };
-const handleDelete=async(username:string)=>{
-const confirmDelete=window.confirm("Are You Sure Do You Want To Delete?");
-if(confirmDelete){
-  try{
-    await dispatch(deletePatientDetails(username,organization));
-    toast.success('Patient Details Deleted Successfully');
-  }catch{
-    toast.error('Failed to Delete Patient Details');
-  }
-}
-};
-  
+  const handleDelete = async (username: string) => {
+    const confirmDelete = window.confirm("Are You Sure Do You Want To Delete?");
+    if (confirmDelete) {
+      try {
+        await dispatch(deletePatientDetails(username, organization));
+        toast.success("Patient Details Deleted Successfully");
+      } catch {
+        toast.error("Failed to Delete Patient Details");
+      }
+    }
+  };
+
   return (
     <div className="main">
-      { loading && <Loader /> }
+      {loading && <Loader />}
       <div className="table-container">
         <div className="heading1">
-          <h4>All patient List</h4>
-          <div className="mx-2">
+          <h2>All patient List</h2>
+          <br></br>
+          <div className="mx-1">
             <FaPlus
               data-bs-target="#exampleModal"
               style={{ cursor: "pointer" }}
@@ -221,16 +235,16 @@ if(confirmDelete){
             />
           </div>
         </div>
-        <table className="table table-bordered">
+        <Table responsive bordered>
           <thead>
             <tr>
               <th scope="col">patient Name</th>
               <th scope="col">patient ID</th>
               <th scope="col">Date of Birth</th>
-              <th scope="col">SSN</th>
               <th scope="col">Email</th>
-              <th scope="col">Gender</th>
+              <th scope="col">SSN</th>
               <th scope="col">Beacon Device</th>
+              {/* <th scope="col">Gender</th> */}
               <th scope="col">Action</th>
             </tr>
           </thead>
@@ -246,25 +260,27 @@ if(confirmDelete){
                 </td>
                 <td>{patient.id}</td>
                 <td>{patient.basicDetails[0].birthDate}</td>
-                <td>{patient.basicDetails[0].ssn}</td>
                 <td>{patient.email}</td>
-                <td>{patient.basicDetails[0].gender}</td>
+                <td>{patient.basicDetails[0].ssn}</td>
+
                 <td>{patient.beaconDevice}</td>
-                <td className="text-center">
-            <FontAwesomeIcon
-                icon={faTrash}
-                className="text-danger"
-                onClick={() => handleDelete(patient.username)}
-                style={{ cursor: "pointer"}}
-            />
-        </td>
+
+                {/* <td>{patient.basicDetails[0].gender}</td> */}
+               <td className="text-center">
+                  <FontAwesomeIcon
+                    icon={faTrash}
+                    className="text-danger"
+                    onClick={() => handleDelete(patient.username)}
+                    style={{ cursor: "pointer" }}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
         <Modal isOpen={editModal} toggle={() => setEditModal(false)} centered>
           <ModalHeader toggle={() => setEditModal(false)}>
-           <h3>Patient Details</h3> 
+            <h3>Patient Details</h3>
           </ModalHeader>
           <ModalBody>
             <div>
@@ -359,8 +375,8 @@ if(confirmDelete){
                   value={formData.mrNumber}
                   onChange={handleChange}
                 />
-                
-                  <label
+
+                <label
                   htmlFor="gender"
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
@@ -376,21 +392,21 @@ if(confirmDelete){
                   onChange={handleChange}
                 />
                 <label
-                htmlFor="birthDate"
-                className="floating-label"
-                style={{ fontWeight: "bold" }}
-              >
-                Date Of Birth
-              </label>
-              <input
-                type="text"
-                id="birthDate"
-                name="birthDate"
-                placeholder="Enter BirthDate"
-                value={formData.birthDate}
-                onChange={handleChange}
-              />
-              <label
+                  htmlFor="birthDate"
+                  className="floating-label"
+                  style={{ fontWeight: "bold" }}
+                >
+                  Date Of Birth
+                </label>
+                <input
+                  type="text"
+                  id="birthDate"
+                  name="birthDate"
+                  placeholder="Enter BirthDate"
+                  value={formData.birthDate}
+                  onChange={handleChange}
+                />
+                <label
                   htmlFor="addressLine1"
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
@@ -410,7 +426,6 @@ if(confirmDelete){
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
                 >
-                  
                   AddressLine 2
                 </label>
                 <input
@@ -441,7 +456,7 @@ if(confirmDelete){
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
                 >
-                State/Provide
+                  State/Provide
                 </label>
                 <input
                   type="text"
@@ -466,8 +481,8 @@ if(confirmDelete){
                   value={formData.postalCode}
                   onChange={handleChange}
                 />
-               
-                  <label
+
+                <label
                   htmlFor="country"
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
@@ -482,7 +497,7 @@ if(confirmDelete){
                   value={formData.country}
                   onChange={handleChange}
                 />
-                 <label
+                <label
                   htmlFor="deviceId"
                   className="floating-label"
                   style={{ fontWeight: "bold" }}
@@ -528,6 +543,6 @@ if(confirmDelete){
       </div>
     </div>
   );
-}
+};
 
 export default Patient;

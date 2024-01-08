@@ -29,6 +29,7 @@
     "react-dropdown-tree-select": "^2.8.0",
     "react-icons": "^4.12.0",
     "react-redux": "^9.0.4",
+    "react-responsive": "^9.0.2",
     "react-router-dom": "^6.21.1",
     "react-scripts": "^5.0.1",
     "react-tabs": "^6.0.2",

@@ -9,7 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { Modal, ModalFooter, ModalHeader, ModalBody, Button } from "reactstrap";
+import { Modal, ModalFooter, ModalHeader, ModalBody, Button,Table } from "reactstrap";
 import Loader from "../../components/loader/Loader";
 interface FormData {
   firstName: string;
@@ -228,7 +228,7 @@ const Staff: React.FC = () => {
             />
           </div>
         </div>
-        <table className="table table-bordered">
+        <Table className="table table-bordered">
           <thead>
             <tr>
               <th scope="col">Staff Name</th>
@@ -266,7 +266,8 @@ const Staff: React.FC = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
+
         <Modal isOpen={editModal} toggle={() => setEditModal(false)} centered>
           <ModalHeader toggle={() => setEditModal(false)}>
             <h3>Staff Details</h3>
