@@ -208,7 +208,7 @@ const Staff = () => {
           {renderDropdown('gender')}
         </div> 
     <div className='col-md-6 mb-2'>
-      <TextField id="outlined-basic-2" label="Date of Birth" variant="outlined" fullWidth onChange={(e) => setFormData({ ...formData, dateofBirth: e.target.value })}/>
+      <TextField id="outlined-basic-2" label="Date of Birth" variant="outlined"  type='date' fullWidth onChange={(e) => setFormData({ ...formData, dateofBirth: e.target.value })}/>
     </div>    
   </div>
 

@@ -6,3 +6,18 @@
     justify-content: center;
     align-items: center;
 }
+/* Default styles for smaller screens */
+.table-container {
+    margin: 20px auto; /* Adjust margin for smaller screens */
+}
+
+/* Media query for larger screens */
+@media (min-width: 768px) {
+    .table-container {
+        max-width: 60%; /* Adjust maximum width for larger screens */
+    }
+
+    .heading1 {
+        width: 100%; /* Adjust width for larger screens */
+    }
+}
